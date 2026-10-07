@@ -70,13 +70,11 @@
   let count = 0;
   let shots = [];
   let teeLat, teeLon;
+  let currentClub = '';
 
   function selectClub(club) {
+    currentClub = club;
     document.getElementById('result').textContent = club + ' 선택됨!';
-    count = count + 1;
-    shots.push(count + '번 샷: ' + club);
-    localStorage.setItem('shots', JSON.stringify(shots));
-    renderLog();
   }
 
   function renderLog() {
@@ -99,10 +97,15 @@
 
   function markBall() {
     navigator.geolocation.getCurrentPosition(function(pos) {
-      let yards = distanceYards(teeLat, teeLon,
-        pos.coords.latitude, pos.coords.longitude);
+      let yards = Math.round(distanceYards(teeLat, teeLon,
+        pos.coords.latitude, pos.coords.longitude));
       document.getElementById('distance').textContent =
-        '비거리: ' + Math.round(yards) + '야드';
+        '비거리: ' + yards + '야드';
+      count = count + 1;
+      let record = count + '번 샷: ' + currentClub + ' - ' + yards + '야드';
+      shots.push(record);
+      localStorage.setItem('shots', JSON.stringify(shots));
+      renderLog();
     });
   }
 
@@ -124,5 +127,6 @@
     renderLog();
   }
 </script>
+
 </body>
 </html>
