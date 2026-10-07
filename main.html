@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>내 첫 골프 앱</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1a2e1a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { font-size: 28px; }
+    .club {
+      display: block;
+      width: 200px;
+      margin: 10px auto;
+      padding: 15px;
+      font-size: 18px;
+      background: #2d5a2d;
+      color: white;
+      border: none;
+      border-radius: 10px;
+    }
+    .gps { background: #1565c0; }
+    #result {
+      font-size: 20px;
+      margin-top: 20px;
+      color: #ffd54f;
+    }
+    #log {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+    #log li {
+      background: #2d5a2d;
+      margin: 5px auto;
+      padding: 8px;
+      width: 200px;
+      border-radius: 8px;
+    }
+    #distance {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffd54f;
+    }
+  </style>
+</head>
+<body>
+  <h1>⛳ 클럽 선택</h1>
+  <button class="club" onclick="selectClub('드라이버')">드라이버</button>
+  <button class="club" onclick="selectClub('우드')">우드</button>
+  <button class="club" onclick="selectClub('아이언')">아이언</button>
+  <button class="club" onclick="selectClub('웨지')">웨지</button>
+  <button class="club" onclick="selectClub('퍼터')">퍼터</button>
+  <p id="result"></p>
+
+  <h2>📝 샷 기록</h2>
+  <ul id="log"></ul>
+
+  <h2>📍 비거리 측정</h2>
+  <button class="club gps" onclick="markTee()">티 위치 저장</button>
+  <button class="club gps" onclick="markBall()">공 위치 저장 & 거리 계산</button>
+  <p id="distance"></p>
+
+  <script>
+  let count = 0;
+  let shots = [];
+  let teeLat, teeLon;
+  let currentClub = '';
+
+  function selectClub(club) {
+    currentClub = club;
+    document.getElementById('result').textContent = club + ' 선택됨!';
+  }
+
+  function renderLog() {
+    let log = document.getElementById('log');
+    log.innerHTML = '';
+    for (let s of shots) {
+      let li = document.createElement('li');
+      li.textContent = s;
+      log.appendChild(li);
+    }
+  }
+
+  function markTee() {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      teeLat = pos.coords.latitude;
+      teeLon = pos.coords.longitude;
+      document.getElementById('distance').textContent = '티 위치 저장됨!';
+    });
+  }
+
+  function markBall() {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      let yards = Math.round(distanceYards(teeLat, teeLon,
+        pos.coords.latitude, pos.coords.longitude));
+      document.getElementById('distance').textContent =
+        '비거리: ' + yards + '야드';
+      count = count + 1;
+      let record = count + '번 샷: ' + currentClub + ' - ' + yards + '야드';
+      shots.push(record);
+      localStorage.setItem('shots', JSON.stringify(shots));
+      renderLog();
+    });
+  }
+
+  function distanceYards(lat1, lon1, lat2, lon2) {
+    let R = 6371000;
+    let dLat = (lat2 - lat1) * Math.PI / 180;
+    let dLon = (lon2 - lon1) * Math.PI / 180;
+    let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c * 1.09361;
+  }
+
+  let saved = localStorage.getItem('shots');
+  if (saved) {
+    shots = JSON.parse(saved);
+    count = shots.length;
+    renderLog();
+  }
+</script>
+
+</body>
+</html>
