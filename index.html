@@ -19,7 +19,7 @@
       width: 31%;
       min-width: 100px;
       margin: 5px 1%;
-      padding: 18px 5px;
+      padding: 36px 5px;
       font-size: 18px;
       background: #2d5a2d;
       color: white;
@@ -177,6 +177,10 @@
     }
 
     function selectClub(club) {
+      if (club === '퍼터') {
+        handlePutter();
+        return;
+      }
       navigator.geolocation.getCurrentPosition(function(pos) {
         history.push({
           shotNum: shotNum,
@@ -190,7 +194,7 @@
         let lat = pos.coords.latitude;
         let lon = pos.coords.longitude;
 
-        if (lastLat !== null) {
+        if (lastLat !== null && currentClub !== '퍼터') {
           let yards = Math.round(distanceYards(lastLat, lastLon, lat, lon));
           count = count + 1;
           shots.push({hole: currentHole, num: shotNum, club: currentClub, yards: yards});
@@ -206,6 +210,40 @@
         lastLon = lon;
         document.getElementById('result').textContent =
           currentHole + '번 홀 ' + shotNum + '번 샷: ' + club;
+      });
+    }
+
+    function handlePutter() {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        if (lastLat !== null && currentClub !== '' && currentClub !== '퍼터') {
+          history.push({
+            shotNum: shotNum,
+            currentClub: currentClub,
+            lastLat: lastLat,
+            lastLon: lastLon,
+            shotsLength: shots.length,
+            count: count
+          });
+          let yards = Math.round(distanceYards(lastLat, lastLon,
+            pos.coords.latitude, pos.coords.longitude));
+          count = count + 1;
+          shots.push({hole: currentHole, num: shotNum, club: currentClub, yards: yards});
+          saveShots();
+          renderList('log', currentHole);
+          document.getElementById('distance').textContent =
+            shotNum + '번 샷(' + currentClub + '): ' + yards + '야드';
+        }
+        currentClub = '퍼터';
+        document.getElementById('result').textContent =
+          currentHole + '번 홀 퍼팅 중...';
+
+        if (confirm('이번 홀 종료할까요?')) {
+          if (currentHole >= 18) {
+            backToHoles();
+          } else {
+            selectHole(currentHole + 1);
+          }
+        }
       });
     }
 
