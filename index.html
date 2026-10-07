@@ -29,6 +29,7 @@
     .hole-btn { width: 22%; font-size: 20px; }
     .gps { background: #1565c0; }
     .danger { background: #b71c1c; }
+    .undo-btn { background: #6a1b9a; }
     .wide { width: 80%; display: block; margin: 10px auto; }
     #result { font-size: 20px; margin-top: 15px; color: #ffd54f; }
     #log, #recordLog { list-style: none; padding: 0; margin-top: 10px; }
@@ -89,6 +90,7 @@
     <p id="result"></p>
     <p id="distance"></p>
 
+    <button class="club undo-btn wide" onclick="undoLast()">↩ 잘못 눌렀어요</button>
     <button class="club gps wide" onclick="holeOut()">🏁 홀 아웃</button>
 
     <h2>📝 샷 기록</h2>
@@ -123,6 +125,7 @@
     let shotNum = 0;
     let currentClub = '';
     let lastLat = null, lastLon = null;
+    let history = [];
 
     const clubGroups = {
       '드라이버': ['드라이버'],
@@ -148,6 +151,7 @@
       currentClub = '';
       lastLat = null;
       lastLon = null;
+      history = [];
       document.getElementById('holeNum').textContent = hole;
       document.getElementById('result').textContent = '';
       document.getElementById('distance').textContent = '';
@@ -174,6 +178,15 @@
 
     function selectClub(club) {
       navigator.geolocation.getCurrentPosition(function(pos) {
+        history.push({
+          shotNum: shotNum,
+          currentClub: currentClub,
+          lastLat: lastLat,
+          lastLon: lastLon,
+          shotsLength: shots.length,
+          count: count
+        });
+
         let lat = pos.coords.latitude;
         let lon = pos.coords.longitude;
 
@@ -194,6 +207,26 @@
         document.getElementById('result').textContent =
           currentHole + '번 홀 ' + shotNum + '번 샷: ' + club;
       });
+    }
+
+    function undoLast() {
+      if (history.length === 0) return;
+      let prev = history.pop();
+      shotNum = prev.shotNum;
+      currentClub = prev.currentClub;
+      lastLat = prev.lastLat;
+      lastLon = prev.lastLon;
+      shots.length = prev.shotsLength;
+      count = prev.count;
+      saveShots();
+      renderList('log', currentHole);
+      if (shotNum === 0) {
+        document.getElementById('result').textContent = '클럽을 선택하세요';
+      } else {
+        document.getElementById('result').textContent =
+          currentHole + '번 홀 ' + shotNum + '번 샷: ' + currentClub;
+      }
+      document.getElementById('distance').textContent = '';
     }
 
     function holeOut() {
@@ -253,6 +286,7 @@
     function clearLog() {
       shots = [];
       count = 0;
+      history = [];
       localStorage.removeItem('shots');
       renderList('log', currentHole);
     }
