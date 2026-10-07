@@ -119,6 +119,9 @@
   </div>
 
   <script>
+    if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('sw.js');
+}
     let count = 0;
     let shots = [];
     let currentHole = 0;
