@@ -1,270 +1,301 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>내 첫 골프 앱</title>
-<link rel="manifest" href="manifest.json">
-<style>
-body {
-font-family: sans-serif;
-background: #1a2e1a;
-color: white;
-text-align: center;
-padding: 20px;
-}
-h1 { font-size: 28px; }
-h3 { margin: 15px 0 5px; color: #a5d6a7; font-size: 15px; }
-.club {
-display: inline-block;
-width: 100px;
-margin: 5px;
-padding: 12px 5px;
-font-size: 16px;
-background: #2d5a2d;
-color: white;
-border: none;
-border-radius: 10px;
-}
-.hole-btn { width: 70px; font-size: 18px; }
-.gps { background: #1565c0; }
-.danger { background: #b71c1c; }
-.wide { width: 220px; display: block; margin: 10px auto; }
-#result { font-size: 20px; margin-top: 15px; color: #ffd54f; }
-#log, #recordLog { list-style: none; padding: 0; margin-top: 10px; }
-#log li, #recordLog li {
-background: #2d5a2d;
-margin: 5px auto;
-padding: 8px;
-width: 280px;
-border-radius: 8px;
-font-size: 14px;
-}
-#distance, #avgResult { font-size: 24px; font-weight: bold; color: #ffd54f; }
-.topbar { display: flex; justify-content: space-between; align-items: center; }
-.topbar button {
-background: #3c4043;
-color: white;
-border: none;
-border-radius: 8px;
-padding: 8px 12px;
-font-size: 14px;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>내 첫 골프 앱</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1a2e1a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { font-size: 28px; }
+    h3 { margin: 15px 0 5px; color: #a5d6a7; font-size: 15px; }
+    .club {
+      display: inline-block;
+      width: 31%;
+      min-width: 100px;
+      margin: 5px 1%;
+      padding: 18px 5px;
+      font-size: 18px;
+      background: #2d5a2d;
+      color: white;
+      border: none;
+      border-radius: 10px;
+    }
+    .hole-btn { width: 22%; font-size: 20px; }
+    .gps { background: #1565c0; }
+    .danger { background: #b71c1c; }
+    .wide { width: 80%; display: block; margin: 10px auto; }
+    #result { font-size: 20px; margin-top: 15px; color: #ffd54f; }
+    #log, #recordLog { list-style: none; padding: 0; margin-top: 10px; }
+    #log li, #recordLog li {
+      background: #2d5a2d;
+      margin: 5px auto;
+      padding: 8px;
+      width: 280px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    #distance, #avgResult { font-size: 24px; font-weight: bold; color: #ffd54f; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; }
+    .topbar button {
+      background: #3c4043;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-<div id="screen-hole">
-<h1>⛳ 홀 선택</h1>
-<div id="holeButtons"></div>
-<button class="club gps wide" onclick="showRecords()">📊 기록 보기</button>
-</div>
-<div id="screen-play" style="display:none;">
-<div class="topbar">
-<h1 style="margin:0;"><span id="holeNum"></span>번 홀</h1>
-<button onclick="backToHoles()">홀 변경</button>
-</div>
-<h3>우드 · 유틸리티</h3>
-<button class="club" onclick="selectClub('드라이버')">드라이버</button>
-<button class="club" onclick="selectClub('3번 우드')">3번 우드</button>
-<button class="club" onclick="selectClub('5번 우드')">5번 우드</button>
-<button class="club" onclick="selectClub('유틸리티 4번')">유틸 4번</button>
-<h3>아이언</h3>
-<button class="club" onclick="selectClub('4번 아이언')">4번</button>
-<button class="club" onclick="selectClub('5번 아이언')">5번</button>
-<button class="club" onclick="selectClub('6번 아이언')">6번</button>
-<button class="club" onclick="selectClub('7번 아이언')">7번</button>
-<button class="club" onclick="selectClub('8번 아이언')">8번</button>
-<button class="club" onclick="selectClub('9번 아이언')">9번</button>
-<h3>웨지 · 퍼터</h3>
-<button class="club" onclick="selectClub('피칭웨지')">P</button>
-<button class="club" onclick="selectClub('갭웨지')">G</button>
-<button class="club" onclick="selectClub('샌드웨지')">S</button>
-<button class="club" onclick="selectClub('퍼터')">퍼터</button>
-<p id="result"></p>
-<p id="distance"></p>
-<button class="club gps wide" onclick="holeOut()">🏁 홀 아웃</button>
-<h2>📝 샷 기록</h2>
-<ul id="log"></ul>
-<button class="club danger wide" onclick="clearLog()">기록 지우기</button>
-</div>
-<div id="screen-records" style="display:none;">
-<div class="topbar">
-<h1 style="margin:0;">📊 기록 보기</h1>
-<button onclick="backToHoles()">닫기</button>
-</div>
-<h3>클럽별 평균 비거리</h3>
-<div>
-<button class="club" onclick="showAverage('드라이버')">드라이버</button>
-<button class="club" onclick="showAverage('우드')">우드</button>
-<button class="club" onclick="showAverage('유틸리티')">유틸리티</button>
-<button class="club" onclick="showAverage('아이언')">아이언</button>
-<button class="club" onclick="showAverage('웨지')">웨지</button>
-<button class="club" onclick="showAverage('퍼터')">퍼터</button>
-<button class="club" onclick="showAverage('전체')">전체</button>
-</div>
-<p id="avgResult"></p>
-<h2>📝 전체 기록</h2>
-<ul id="recordLog"></ul>
-</div>
-<script>
-let count = 0;
-let shots = [];
-let currentHole = 0;
-let shotNum = 0;
-let currentClub = '';
-let lastLat = null, lastLon = null;
-const clubGroups = {
-'드라이버': ['드라이버'],
-'우드': ['3번 우드', '5번 우드'],
-'유틸리티': ['유틸리티 4번'],
-'아이언': ['4번 아이언', '5번 아이언', '6번 아이언', '7번 아이언', '8번 아이언', '9번 아이언'],
-'웨지': ['피칭웨지', '갭웨지', '샌드웨지'],
-'퍼터': ['퍼터']
-};
-let hb = document.getElementById('holeButtons');
-for (let h = 1; h <= 18; h++) {
-let btn = document.createElement('button');
-btn.className = 'club hole-btn';
-btn.textContent = h;
-btn.setAttribute('onclick', 'selectHole(' + h + ')');
-hb.appendChild(btn);
-}
-function selectHole(hole) {
-currentHole = hole;
-shotNum = 0;
-currentClub = '';
-lastLat = null;
-lastLon = null;
-document.getElementById('holeNum').textContent = hole;
-document.getElementById('result').textContent = '';
-document.getElementById('distance').textContent = '';
-showScreen('screen-play');
-}
-function backToHoles() {
-showScreen('screen-hole');
-}
-function showScreen(id) {
-for (let s of ['screen-hole', 'screen-play', 'screen-records']) {
-document.getElementById(s).style.display =
-(s === id) ? 'block' : 'none';
-}
-}
-function showRecords() {
-document.getElementById('avgResult').textContent = '';
-renderList('recordLog');
-showScreen('screen-records');
-}
-function selectClub(club) {
-navigator.geolocation.getCurrentPosition(function(pos) {
-let lat = pos.coords.latitude;
-let lon = pos.coords.longitude;
-if (lastLat !== null) {
-let yards = Math.round(distanceYards(lastLat, lastLon, lat, lon));
-count = count + 1;
-shots.push({hole: currentHole, num: shotNum, club: currentClub, yards: yards});
-saveShots();
-renderList('log');
-document.getElementById('distance').textContent =
-shotNum + '번 샷(' + currentClub + '): ' + yards + '야드';
-}
-shotNum = shotNum + 1;
-currentClub = club;
-lastLat = lat;
-lastLon = lon;
-document.getElementById('result').textContent =
-currentHole + '번 홀 ' + shotNum + '번 샷: ' + club;
-});
-}
-function holeOut() {
-navigator.geolocation.getCurrentPosition(function(pos) {
-if (lastLat !== null && currentClub !== '') {
-let yards = Math.round(distanceYards(lastLat, lastLon,
-pos.coords.latitude, pos.coords.longitude));
-count = count + 1;
-shots.push({hole: currentHole, num: shotNum, club: currentClub, yards: yards});
-saveShots();
-renderList('log');
-}
-backToHoles();
-});
-}
-function showAverage(group) {
-let clubs = (group === '전체')
-? Object.values(clubGroups).flat()
-: clubGroups[group];
-let total = 0, n = 0;
-for (let s of shots) {
-if (clubs.includes(s.club)) {
-total += s.yards;
-n++;
-}
-}
-let el = document.getElementById('avgResult');
-if (n === 0) {
-el.textContent = group + ': 기록 없음';
-} else {
-el.textContent = group + ' 평균: ' +
-Math.round(total / n) + '야드 (' + n + '회)';
-}
-}
-function formatShot(s) {
-return s.hole + '번 홀 ' + s.num + '번 샷: ' +
-s.club + ' - ' + s.yards + '야드';
-}
-function renderList(elId) {
-let log = document.getElementById(elId);
-log.innerHTML = '';
-for (let s of shots) {
-let li = document.createElement('li');
-li.textContent = formatShot(s);
-log.appendChild(li);
-}
-}
-function saveShots() {
-localStorage.setItem('shots', JSON.stringify(shots));
-}
-function clearLog() {
-shots = [];
-count = 0;
-localStorage.removeItem('shots');
-renderList('log');
-}
-function distanceYards(lat1, lon1, lat2, lon2) {
-let R = 6371000;
-let dLat = (lat2 - lat1) * Math.PI / 180;
-let dLon = (lon2 - lon1) * Math.PI / 180;
-let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-Math.sin(dLon/2) * Math.sin(dLon/2);
-let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-return R * c * 1.09361;
-}
-function parseOldRecord(str) {
-let m = str.match(/(?:(\d+)번 홀 )?(\d+)번 샷: (.+) - (\d+)야드/);
-if (m) {
-return {
-hole: m[1] ? parseInt(m[1]) : 0,
-num: parseInt(m[2]),
-club: m[3].trim(),
-yards: parseInt(m[4])
-};
-}
-return null;
-}
-let saved = localStorage.getItem('shots');
-if (saved) {
-let arr = JSON.parse(saved);
-shots = [];
-for (let s of arr) {
-if (typeof s === 'string') {
-let p = parseOldRecord(s);
-if (p) shots.push(p);
-} else {
-shots.push(s);
-}
-}
-count = shots.length;
-renderList('log');
-}
-</script>
+
+  <div id="screen-hole">
+    <h1>⛳ 홀 선택</h1>
+    <div id="holeButtons"></div>
+    <button class="club gps wide" onclick="showRecords()">📊 기록 보기</button>
+  </div>
+
+  <div id="screen-play" style="display:none;">
+    <div class="topbar">
+      <h1 style="margin:0;"><span id="holeNum"></span>번 홀</h1>
+      <button onclick="backToHoles()">홀 변경</button>
+    </div>
+
+    <h3>우드 · 유틸리티</h3>
+    <button class="club" onclick="selectClub('드라이버')">드라이버</button>
+    <button class="club" onclick="selectClub('3번 우드')">3번 우드</button>
+    <button class="club" onclick="selectClub('5번 우드')">5번 우드</button>
+    <button class="club" onclick="selectClub('유틸리티 4번')">유틸 4번</button>
+
+    <h3>아이언</h3>
+    <button class="club" onclick="selectClub('4번 아이언')">4번</button>
+    <button class="club" onclick="selectClub('5번 아이언')">5번</button>
+    <button class="club" onclick="selectClub('6번 아이언')">6번</button>
+    <button class="club" onclick="selectClub('7번 아이언')">7번</button>
+    <button class="club" onclick="selectClub('8번 아이언')">8번</button>
+    <button class="club" onclick="selectClub('9번 아이언')">9번</button>
+
+    <h3>웨지 · 퍼터</h3>
+    <button class="club" onclick="selectClub('피칭웨지')">P</button>
+    <button class="club" onclick="selectClub('갭웨지')">G</button>
+    <button class="club" onclick="selectClub('샌드웨지')">S</button>
+    <button class="club" onclick="selectClub('퍼터')">퍼터</button>
+
+    <p id="result"></p>
+    <p id="distance"></p>
+
+    <button class="club gps wide" onclick="holeOut()">🏁 홀 아웃</button>
+
+    <h2>📝 샷 기록</h2>
+    <ul id="log"></ul>
+    <button class="club danger wide" onclick="clearLog()">기록 지우기</button>
+  </div>
+
+  <div id="screen-records" style="display:none;">
+    <div class="topbar">
+      <h1 style="margin:0;">📊 기록 보기</h1>
+      <button onclick="backToHoles()">닫기</button>
+    </div>
+    <h3>클럽별 평균 비거리</h3>
+    <div>
+      <button class="club" onclick="showAverage('드라이버')">드라이버</button>
+      <button class="club" onclick="showAverage('우드')">우드</button>
+      <button class="club" onclick="showAverage('유틸리티')">유틸리티</button>
+      <button class="club" onclick="showAverage('아이언')">아이언</button>
+      <button class="club" onclick="showAverage('웨지')">웨지</button>
+      <button class="club" onclick="showAverage('퍼터')">퍼터</button>
+      <button class="club" onclick="showAverage('전체')">전체</button>
+    </div>
+    <p id="avgResult"></p>
+    <h2>📝 전체 기록</h2>
+    <ul id="recordLog"></ul>
+  </div>
+
+  <script>
+    let count = 0;
+    let shots = [];
+    let currentHole = 0;
+    let shotNum = 0;
+    let currentClub = '';
+    let lastLat = null, lastLon = null;
+
+    const clubGroups = {
+      '드라이버': ['드라이버'],
+      '우드': ['3번 우드', '5번 우드'],
+      '유틸리티': ['유틸리티 4번'],
+      '아이언': ['4번 아이언', '5번 아이언', '6번 아이언', '7번 아이언', '8번 아이언', '9번 아이언'],
+      '웨지': ['피칭웨지', '갭웨지', '샌드웨지'],
+      '퍼터': ['퍼터']
+    };
+
+    let hb = document.getElementById('holeButtons');
+    for (let h = 1; h <= 18; h++) {
+      let btn = document.createElement('button');
+      btn.className = 'club hole-btn';
+      btn.textContent = h;
+      btn.setAttribute('onclick', 'selectHole(' + h + ')');
+      hb.appendChild(btn);
+    }
+
+    function selectHole(hole) {
+      currentHole = hole;
+      shotNum = 0;
+      currentClub = '';
+      lastLat = null;
+      lastLon = null;
+      document.getElementById('holeNum').textContent = hole;
+      document.getElementById('result').textContent = '';
+      document.getElementById('distance').textContent = '';
+      renderList('log', hole);
+      showScreen('screen-play');
+    }
+
+    function backToHoles() {
+      showScreen('screen-hole');
+    }
+
+    function showScreen(id) {
+      for (let s of ['screen-hole', 'screen-play', 'screen-records']) {
+        document.getElementById(s).style.display =
+          (s === id) ? 'block' : 'none';
+      }
+    }
+
+    function showRecords() {
+      document.getElementById('avgResult').textContent = '';
+      renderList('recordLog');
+      showScreen('screen-records');
+    }
+
+    function selectClub(club) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        let lat = pos.coords.latitude;
+        let lon = pos.coords.longitude;
+
+        if (lastLat !== null) {
+          let yards = Math.round(distanceYards(lastLat, lastLon, lat, lon));
+          count = count + 1;
+          shots.push({hole: currentHole, num: shotNum, club: currentClub, yards: yards});
+          saveShots();
+          renderList('log', currentHole);
+          document.getElementById('distance').textContent =
+            shotNum + '번 샷(' + currentClub + '): ' + yards + '야드';
+        }
+
+        shotNum = shotNum + 1;
+        currentClub = club;
+        lastLat = lat;
+        lastLon = lon;
+        document.getElementById('result').textContent =
+          currentHole + '번 홀 ' + shotNum + '번 샷: ' + club;
+      });
+    }
+
+    function holeOut() {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        if (lastLat !== null && currentClub !== '') {
+          let yards = Math.round(distanceYards(lastLat, lastLon,
+            pos.coords.latitude, pos.coords.longitude));
+          count = count + 1;
+          shots.push({hole: currentHole, num: shotNum, club: currentClub, yards: yards});
+          saveShots();
+          renderList('log', currentHole);
+        }
+        backToHoles();
+      });
+    }
+
+    function showAverage(group) {
+      let clubs = (group === '전체')
+        ? Object.values(clubGroups).flat()
+        : clubGroups[group];
+      let total = 0, n = 0;
+      for (let s of shots) {
+        if (clubs.includes(s.club)) {
+          total += s.yards;
+          n++;
+        }
+      }
+      let el = document.getElementById('avgResult');
+      if (n === 0) {
+        el.textContent = group + ': 기록 없음';
+      } else {
+        el.textContent = group + ' 평균: ' +
+          Math.round(total / n) + '야드 (' + n + '회)';
+      }
+    }
+
+    function formatShot(s) {
+      return s.hole + '번 홀 ' + s.num + '번 샷: ' +
+        s.club + ' - ' + s.yards + '야드';
+    }
+
+    function renderList(elId, holeFilter) {
+      let log = document.getElementById(elId);
+      log.innerHTML = '';
+      for (let s of shots) {
+        if (holeFilter !== undefined && s.hole !== holeFilter) continue;
+        let li = document.createElement('li');
+        li.textContent = formatShot(s);
+        log.appendChild(li);
+      }
+    }
+
+    function saveShots() {
+      localStorage.setItem('shots', JSON.stringify(shots));
+    }
+
+    function clearLog() {
+      shots = [];
+      count = 0;
+      localStorage.removeItem('shots');
+      renderList('log', currentHole);
+    }
+
+    function distanceYards(lat1, lon1, lat2, lon2) {
+      let R = 6371000;
+      let dLat = (lat2 - lat1) * Math.PI / 180;
+      let dLon = (lon2 - lon1) * Math.PI / 180;
+      let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c * 1.09361;
+    }
+
+    function parseOldRecord(str) {
+      let m = str.match(/(?:(\d+)번 홀 )?(\d+)번 샷: (.+) - (\d+)야드/);
+      if (m) {
+        return {
+          hole: m[1] ? parseInt(m[1]) : 0,
+          num: parseInt(m[2]),
+          club: m[3].trim(),
+          yards: parseInt(m[4])
+        };
+      }
+      return null;
+    }
+
+    let saved = localStorage.getItem('shots');
+    if (saved) {
+      let arr = JSON.parse(saved);
+      shots = [];
+      for (let s of arr) {
+        if (typeof s === 'string') {
+          let p = parseOldRecord(s);
+          if (p) shots.push(p);
+        } else {
+          shots.push(s);
+        }
+      }
+      count = shots.length;
+      renderList('log');
+    }
+  </script>
 </body>
 </html>
