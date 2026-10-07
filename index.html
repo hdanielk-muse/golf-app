@@ -10,46 +10,53 @@
       background: #1a2e1a;
       color: white;
       text-align: center;
-      padding: 20px;
+      padding: 8px;
     }
-    h1 { font-size: 28px; }
-    h3 { margin: 15px 0 5px; color: #a5d6a7; font-size: 15px; }
+    h1 { font-size: 64px; }
+    h2 { font-size: 52px; }
+    h3 { margin: 20px 0 10px; color: #a5d6a7; font-size: 40px; }
     .club {
-      display: inline-block;
-      width: 31%;
-      min-width: 100px;
-      margin: 5px 1%;
-      padding: 36px 5px;
-      font-size: 18px;
+      display: block;
+      width: 96%;
+      margin: 12px auto;
+      padding: 28px 5px;
+      font-size: 64px;
       background: #2d5a2d;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 16px;
     }
-    .hole-btn { width: 22%; font-size: 20px; }
+    .hole-btn {
+      display: inline-block;
+      width: 31%;
+      margin: 5px 1%;
+      font-size: 52px;
+      padding: 24px 5px;
+    }
     .gps { background: #1565c0; }
     .danger { background: #b71c1c; }
     .undo-btn { background: #6a1b9a; }
-    .wide { width: 80%; display: block; margin: 10px auto; }
-    #result { font-size: 20px; margin-top: 15px; color: #ffd54f; }
+    .wide { font-size: 36px; }
+    #result { font-size: 52px; margin-top: 15px; color: #ffd54f; }
     #log, #recordLog { list-style: none; padding: 0; margin-top: 10px; }
     #log li, #recordLog li {
       background: #2d5a2d;
-      margin: 5px auto;
-      padding: 8px;
-      width: 280px;
-      border-radius: 8px;
-      font-size: 14px;
+      margin: 8px auto;
+      padding: 14px;
+      width: 96%;
+      border-radius: 12px;
+      font-size: 36px;
     }
-    #distance, #avgResult { font-size: 24px; font-weight: bold; color: #ffd54f; }
+    #distance, #avgResult { font-size: 56px; font-weight: bold; color: #ffd54f; }
     .topbar { display: flex; justify-content: space-between; align-items: center; }
+    .topbar h1 { font-size: 40px; margin: 0; }
     .topbar button {
       background: #3c4043;
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 14px;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 28px;
     }
   </style>
 </head>
@@ -63,7 +70,7 @@
 
   <div id="screen-play" style="display:none;">
     <div class="topbar">
-      <h1 style="margin:0;"><span id="holeNum"></span>번 홀</h1>
+      <h1><span id="holeNum"></span>번 홀</h1>
       <button onclick="backToHoles()">홀 변경</button>
     </div>
 
@@ -100,7 +107,7 @@
 
   <div id="screen-records" style="display:none;">
     <div class="topbar">
-      <h1 style="margin:0;">📊 기록 보기</h1>
+      <h1>📊 기록 보기</h1>
       <button onclick="backToHoles()">닫기</button>
     </div>
     <h3>클럽별 평균 비거리</h3>
@@ -120,8 +127,9 @@
 
   <script>
     if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('sw.js');
-}
+      navigator.serviceWorker.register('sw.js');
+    }
+
     let count = 0;
     let shots = [];
     let currentHole = 0;
